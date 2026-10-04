@@ -24,6 +24,7 @@ public class ActionRegistryImpl implements DialogActionRegistry {
         registerAction("console_command", ConsoleCommandDialogAction.INSTANCE);
         registerAction("player_command", PlayerCommandDialogAction.INSTANCE);
         registerAction("send_to_server", SendToServerDialogAction.INSTANCE);
+        registerAction("open_url", OpenUrlDialogAction.INSTANCE);
     }
 
     public void registerAction(String actionId, DialogAction action) {

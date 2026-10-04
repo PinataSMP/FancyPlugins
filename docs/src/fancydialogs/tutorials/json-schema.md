@@ -182,3 +182,4 @@ Available actions include:
 - `open_dialog`: Opens another dialog (set `data` to the ID of the dialog to open)
 - `open_random_dialog`: Opens another dialog (set `data` to a list of dialog IDs separated by commas: 'dialog1,dialog2,dialog3')
 - `send_to_server`: Sends the player to another server (requires BungeeCord or Velocity) (set `data` to the server name)
+- `open_url`: Opens a URL in the player's browser (set `data` to the URL). When it is the only action of a button, the client opens the link directly (after its own confirmation prompt) without a server round-trip; combined with other actions, the server sends a clickable link instead.

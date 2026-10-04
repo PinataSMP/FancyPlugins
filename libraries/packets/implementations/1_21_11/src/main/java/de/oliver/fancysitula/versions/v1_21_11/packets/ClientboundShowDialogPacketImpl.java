@@ -7,6 +7,7 @@ import de.oliver.fancysitula.api.dialogs.actions.FS_CommonButtonData;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogActionButton;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogCopyToClipboardAction;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogCustomAction;
+import de.oliver.fancysitula.api.dialogs.actions.FS_DialogOpenUrlAction;
 import de.oliver.fancysitula.api.dialogs.body.FS_DialogBody;
 import de.oliver.fancysitula.api.dialogs.body.FS_DialogItemBody;
 import de.oliver.fancysitula.api.dialogs.body.FS_DialogTextBody;
@@ -39,6 +40,7 @@ import net.minecraft.server.dialog.input.*;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -246,6 +248,9 @@ public class ClientboundShowDialogPacketImpl extends FS_ClientboundShowDialogPac
         Action action = null;
         if (actionButton.getAction() instanceof FS_DialogCopyToClipboardAction copyToClipboardAction) {
             ClickEvent clickEvent = new ClickEvent.CopyToClipboard(copyToClipboardAction.getValue());
+            action = new StaticAction(clickEvent);
+        } else if (actionButton.getAction() instanceof FS_DialogOpenUrlAction openUrlAction) {
+            ClickEvent clickEvent = new ClickEvent.OpenUrl(URI.create(openUrlAction.getUrl()));
             action = new StaticAction(clickEvent);
         } else if (actionButton.getAction() instanceof FS_DialogCustomAction customAction) {
             Key idKey = Key.key("fancysitula", customAction.getId());

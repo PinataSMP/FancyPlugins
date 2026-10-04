@@ -17,6 +17,7 @@ import de.oliver.fancysitula.api.dialogs.actions.FS_DialogActionButton;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogActionButtonAction;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogCopyToClipboardAction;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogCustomAction;
+import de.oliver.fancysitula.api.dialogs.actions.FS_DialogOpenUrlAction;
 import de.oliver.fancysitula.api.dialogs.body.FS_DialogBody;
 import de.oliver.fancysitula.api.dialogs.body.FS_DialogTextBody;
 import de.oliver.fancysitula.api.dialogs.inputs.*;
@@ -75,6 +76,15 @@ public class DialogImpl extends Dialog {
             return PaperColor.handler().translateRaw(requirements.get("input"), player, Parsers::placeholder).equals(PaperColor.handler().translateRaw(requirements.get("output"), player, Parsers::placeholder));
         }
         return true;
+    }
+
+    /**
+     * Builds a client-side "open_url" button action. The URL supports {arg:n} placeholders
+     * and PlaceholderAPI placeholders; the client opens it directly (after its own confirmation).
+     */
+    private FS_DialogOpenUrlAction buildOpenUrlAction(Player player, String rawUrl, String[] args) {
+        String url = PaperColor.handler().translateRaw(replaceArgs(rawUrl, args), player, Parsers::placeholder);
+        return new FS_DialogOpenUrlAction(url == null ? "" : url.trim());
     }
 
     private FS_Dialog buildForPlayer(Player player, String[] args) {
@@ -159,6 +169,9 @@ public class DialogImpl extends Dialog {
                         Parsers::placeholder
                 );
                 buttonAction = new FS_DialogCopyToClipboardAction(text);
+            } else if (button.actions().size() == 1 &&
+                button.actions().getFirst().name().equals("open_url")) {
+                buttonAction = buildOpenUrlAction(player, button.actions().getFirst().data(), args);
             } else {
                 // Build payload with dialog_id, button_id, and all args
                 Map<String, String> payload = new HashMap<>();
@@ -202,6 +215,9 @@ public class DialogImpl extends Dialog {
                         Parsers::placeholder
                 );
                 buttonAction = new FS_DialogCopyToClipboardAction(text);
+            } else if (data.exitAction().actions().size() == 1 &&
+                    data.exitAction().actions().getFirst().name().equals("open_url")) {
+                buttonAction = buildOpenUrlAction(player, data.exitAction().actions().getFirst().data(), args);
             } else {
                 // Build payload with dialog_id, button_id, and all args
                 Map<String, String> payload = new HashMap<>();
@@ -313,7 +329,8 @@ public class DialogImpl extends Dialog {
 
         long openedAt = viewers.get(uuid);
         long now = System.currentTimeMillis();
-        if (now - openedAt > FancyDialogsPlugin.get().getFancyDialogsConfig().getCloseTimeout()) {
+        long closeTimeout = FancyDialogsPlugin.get().getFancyDialogsConfig().getCloseTimeout();
+        if (closeTimeout > 0 && now - openedAt > closeTimeout) {
             viewers.remove(uuid);
             return false;
         }
