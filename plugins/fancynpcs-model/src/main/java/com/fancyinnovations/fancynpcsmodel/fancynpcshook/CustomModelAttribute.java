@@ -17,6 +17,7 @@ import kr.toxicity.model.api.tracker.EntityTrackerRegistry;
 import kr.toxicity.model.api.tracker.ModelScaler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -55,6 +56,8 @@ public class CustomModelAttribute {
             return;
         }
 
+        applyRotation(npc);
+
         // Gets or creates entity tracker
         EntityTracker tracker = BetterModel.model(modelName)
                 .map(r -> r.getOrCreate(BukkitAdapter.adapt(bukkitEntity)))
@@ -91,6 +94,24 @@ public class CustomModelAttribute {
         EntityTrackerRegistry registry = tracker.registry();
         for (Player player : Bukkit.getOnlinePlayers()) {
             registry.spawn(BukkitAdapter.adapt(player));
+        }
+    }
+
+    private static void applyRotation(Npc npc) {
+        Location location = npc.getData().getLocation();
+        Object nmsEntity = ReflectionUtils.getValue(npc, "npc");
+        if (location == null || nmsEntity == null) return;
+        try {
+            Class<?> clazz = nmsEntity.getClass();
+            clazz.getMethod("setRot", float.class, float.class).invoke(nmsEntity, location.getYaw(), location.getPitch());
+            clazz.getMethod("setYHeadRot", float.class).invoke(nmsEntity, location.getYaw());
+            clazz.getMethod("setYBodyRot", float.class).invoke(nmsEntity, location.getYaw());
+        } catch (ReflectiveOperationException e) {
+            FancyNpcsModelPlugin.get().getFancyLogger().error(
+                    "Failed to apply rotation to NMS entity",
+                    ThrowableProperty.of(e),
+                    StringProperty.of("npc_name", npc.getData().getName())
+            );
         }
     }
 
