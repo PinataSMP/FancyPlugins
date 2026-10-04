@@ -14,6 +14,7 @@ import kr.toxicity.model.api.event.hitbox.HitBoxInteractAtEvent;
 import kr.toxicity.model.api.platform.PlatformEntity;
 import kr.toxicity.model.api.tracker.EntityTracker;
 import kr.toxicity.model.api.tracker.EntityTrackerRegistry;
+import kr.toxicity.model.api.tracker.ModelScaler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -67,10 +68,7 @@ public class CustomModelAttribute {
             return;
         }
 
-        // Scale
-        if (npc.getData().getScale() != 1) {
-            tracker.scaler(tracker.scaler().multiply(npc.getData().getScale()));
-        }
+        tracker.scaler(ModelScaler.value(npc.getData().getScale()));
 
         // Right click on hitbox
         tracker.listenHitBox(HitBoxInteractAtEvent.class, event -> {
