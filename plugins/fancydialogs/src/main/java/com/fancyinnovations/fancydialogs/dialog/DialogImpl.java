@@ -18,6 +18,7 @@ import de.oliver.fancysitula.api.dialogs.actions.FS_DialogActionButtonAction;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogCopyToClipboardAction;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogCustomAction;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogOpenUrlAction;
+import de.oliver.fancysitula.api.dialogs.actions.FS_DialogSuggestCommandAction;
 import de.oliver.fancysitula.api.dialogs.body.FS_DialogBody;
 import de.oliver.fancysitula.api.dialogs.body.FS_DialogTextBody;
 import de.oliver.fancysitula.api.dialogs.inputs.*;
@@ -85,6 +86,15 @@ public class DialogImpl extends Dialog {
     private FS_DialogOpenUrlAction buildOpenUrlAction(Player player, String rawUrl, String[] args) {
         String url = PaperColor.handler().translateRaw(replaceArgs(rawUrl, args), player, Parsers::placeholder);
         return new FS_DialogOpenUrlAction(url == null ? "" : url.trim());
+    }
+
+    /**
+     * Builds a client-side "suggest_command" button action. The command supports {arg:n} placeholders
+     * and PlaceholderAPI placeholders; the client puts it into the chat input without executing it.
+     */
+    private FS_DialogSuggestCommandAction buildSuggestCommandAction(Player player, String rawCommand, String[] args) {
+        String command = PaperColor.handler().translateRaw(replaceArgs(rawCommand, args), player, Parsers::placeholder);
+        return new FS_DialogSuggestCommandAction(command == null ? "" : command.trim());
     }
 
     private FS_Dialog buildForPlayer(Player player, String[] args) {
@@ -172,6 +182,9 @@ public class DialogImpl extends Dialog {
             } else if (button.actions().size() == 1 &&
                 button.actions().getFirst().name().equals("open_url")) {
                 buttonAction = buildOpenUrlAction(player, button.actions().getFirst().data(), args);
+            } else if (button.actions().size() == 1 &&
+                button.actions().getFirst().name().equals("suggest_command")) {
+                buttonAction = buildSuggestCommandAction(player, button.actions().getFirst().data(), args);
             } else {
                 // Build payload with dialog_id, button_id, and all args
                 Map<String, String> payload = new HashMap<>();
@@ -218,6 +231,9 @@ public class DialogImpl extends Dialog {
             } else if (data.exitAction().actions().size() == 1 &&
                     data.exitAction().actions().getFirst().name().equals("open_url")) {
                 buttonAction = buildOpenUrlAction(player, data.exitAction().actions().getFirst().data(), args);
+            } else if (data.exitAction().actions().size() == 1 &&
+                    data.exitAction().actions().getFirst().name().equals("suggest_command")) {
+                buttonAction = buildSuggestCommandAction(player, data.exitAction().actions().getFirst().data(), args);
             } else {
                 // Build payload with dialog_id, button_id, and all args
                 Map<String, String> payload = new HashMap<>();

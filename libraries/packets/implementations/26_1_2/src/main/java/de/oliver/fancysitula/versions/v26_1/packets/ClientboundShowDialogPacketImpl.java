@@ -8,6 +8,7 @@ import de.oliver.fancysitula.api.dialogs.actions.FS_DialogActionButton;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogCopyToClipboardAction;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogCustomAction;
 import de.oliver.fancysitula.api.dialogs.actions.FS_DialogOpenUrlAction;
+import de.oliver.fancysitula.api.dialogs.actions.FS_DialogSuggestCommandAction;
 import de.oliver.fancysitula.api.dialogs.body.FS_DialogBody;
 import de.oliver.fancysitula.api.dialogs.body.FS_DialogItemBody;
 import de.oliver.fancysitula.api.dialogs.body.FS_DialogTextBody;
@@ -252,6 +253,9 @@ public class ClientboundShowDialogPacketImpl extends FS_ClientboundShowDialogPac
             action = new StaticAction(clickEvent);
         } else if (actionButton.getAction() instanceof FS_DialogOpenUrlAction openUrlAction) {
             ClickEvent clickEvent = new ClickEvent.OpenUrl(URI.create(openUrlAction.getUrl()));
+            action = new StaticAction(clickEvent);
+        } else if (actionButton.getAction() instanceof FS_DialogSuggestCommandAction suggestCommandAction) {
+            ClickEvent clickEvent = new ClickEvent.SuggestCommand(suggestCommandAction.getCommand());
             action = new StaticAction(clickEvent);
         } else if (actionButton.getAction() instanceof FS_DialogCustomAction customAction) {
             Key idKey = Key.key("fancysitula", customAction.getId());
