@@ -24,6 +24,10 @@ public record DialogData(
             }
         }
 
+        if (exitAction != null && exitAction.id().equals(buttonId)) {
+            return exitAction;
+        }
+
         return null;
     }
 
